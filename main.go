@@ -16,6 +16,9 @@ const (
 
 func main() {
 
+	test()
+	fmt.Print("\n\n")
+
 	// Inicializar conexao com fila de mensagens
 	// https://astaxie.gitbooks.io/build-web-application-with-golang/content/en/08.1.html
 	positionList = make(map[string]position, 1000000)
@@ -97,8 +100,25 @@ func runInterfaceServerConn(listener *net.TCPListener) {
 				// Respond with N historical data positions for a given ID
 				// 1. Get N historical data positions for given ID
 				id, samples := parseHistRequest(request)
+
 				// 2. Mount message with active clients using mountHistoricsResponse
-				msg := mountHistoricsResponse(getHistoricalData(id, samples), id)
+				var msg string
+				if samples == "1" {
+					pos := positionList[id]
+					data := []positionData{{
+						DateTime: pos.Timestamp,
+						Lat:      pos.Latitude,
+						Long:     pos.Longitude,
+						Vel:      pos.Speed,
+						State:    "1",
+					}}
+
+					msg = mountHistoricsResponse(data, id)
+				} else {
+					// If more than one samples for given ID
+					msg = mountHistoricsResponse(getHistoricalData(id, samples), id)
+				}
+
 				// 3. Send message using conn.Write
 				n, err := conn.Write([]byte(msg))
 				fmt.Println("Bytes Written: ", n)

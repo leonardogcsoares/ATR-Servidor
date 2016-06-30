@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"regexp"
-	"strconv"
 )
 
 // Descricao das mensagens do protocolo usado na comunicacao entre servidor e interface grafica
@@ -18,10 +17,10 @@ const (
 
 type positionData struct {
 	DateTime string
-	Lat      float64
-	Long     float64
-	Vel      int
-	State    int
+	Lat      string
+	Long     string
+	Vel      string
+	State    string
 }
 
 // Servidor responde com mensagen no formato de
@@ -46,8 +45,8 @@ func mountActiveClientsResponse(actives []string) (msg string) {
 // Servidor responde com mensagem historica no formato
 // HIST;<NUM>;<ID>;<POS1>;<POS2>;...;<POSN>   onde
 // POS;<DT>;<LAT>;<LON>;<VEL>;<ESTADO>
-func mountHistoricsResponse(posData []positionData, id int) (msg string) {
-	msg = fmt.Sprintf("HIST;%d;%s", len(posData), strconv.Itoa(id))
+func mountHistoricsResponse(posData []positionData, id string) (msg string) {
+	msg = fmt.Sprintf("HIST;%d;%s", len(posData), id)
 	// Returns ATIVOS;0 if empty array
 	if len(posData) == 0 {
 		msg = fmt.Sprintf("%s;0\n", "HIST")
@@ -55,7 +54,7 @@ func mountHistoricsResponse(posData []positionData, id int) (msg string) {
 	}
 
 	for _, data := range posData {
-		msg += fmt.Sprintf(";POS;%s;%f;%f;%d;%d",
+		msg += fmt.Sprintf(";POS;%s;%s;%s;%s;%s",
 			data.DateTime, data.Lat, data.Long, data.Vel, data.State)
 
 	}
