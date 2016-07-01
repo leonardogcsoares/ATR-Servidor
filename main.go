@@ -12,6 +12,7 @@ const (
 
 	gatewayServPort   = ":7000"
 	interfaceServPort = ":6000"
+	historicServPort  = ":5000"
 )
 
 func main() {
@@ -85,8 +86,8 @@ func runInterfaceServerConn(listener *net.TCPListener) {
 				// Respond with active clients
 				// 1. Get active clients from Gateway
 				// 2. Mount message with active clients using moutActiveClientsResponse
-				// msg := mountActiveClientsResponse([]string{"015225", "115389"})
-				msg := mountActiveClientsResponse(retrieveActiveIDs())
+				msg := mountActiveClientsResponse([]string{"015225", "015225", "115389", "115389"})
+				// msg := mountActiveClientsResponse(retrieveActiveIDs())
 				fmt.Println(msg)
 				// 3. Send message using conn.Write
 				n, err := conn.Write([]byte(msg))
@@ -104,23 +105,28 @@ func runInterfaceServerConn(listener *net.TCPListener) {
 				// 2. Mount message with active clients using mountHistoricsResponse
 				var msg string
 				if samples == "1" {
-					pos := positionList[id]
+					// pos := positionList[id]
 					data := []positionData{{
-						DateTime: pos.Timestamp,
-						Lat:      pos.Latitude,
-						Long:     pos.Longitude,
-						Vel:      pos.Speed,
+						// DateTime: pos.Timestamp,
+						// Lat:      pos.Latitude,
+						// Long:     pos.Longitude,
+						// Vel:      pos.Speed,
+						// State:    "1",
+						DateTime: "123123123",
+						Lat:      "+32.32232",
+						Long:     "-1232113.23",
+						Vel:      "44",
 						State:    "1",
 					}}
-
 					msg = mountHistoricsResponse(data, id)
 				} else {
 					// If more than one samples for given ID
-					msg = mountHistoricsResponse(getHistoricalData(id, samples), id)
+					msg = runHistoricalServerConnection(request)
 				}
 
 				// 3. Send message using conn.Write
 				n, err := conn.Write([]byte(msg))
+				fmt.Println("Message written: ", msg)
 				fmt.Println("Bytes Written: ", n)
 				if err != nil {
 					fmt.Println("Err on writing to interface\n", err.Error())
@@ -131,6 +137,8 @@ func runInterfaceServerConn(listener *net.TCPListener) {
 				break
 
 			}
+
+			request = make([]byte, 128) // clear last read content
 		}
 
 	}
@@ -174,6 +182,7 @@ func runGatewayServerConn(listener *net.TCPListener) {
 				break
 			}
 
+			request = make([]byte, 128) // clear last read content
 		}
 	}
 }
