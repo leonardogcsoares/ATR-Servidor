@@ -27,7 +27,7 @@ type positionData struct {
 // ATIVOS;<NUM>;<ID1>;<ID2>;...;<IDN>
 func mountActiveClientsResponse(actives []string) (msg string) {
 
-	msg = fmt.Sprintf("ATIVOS;%d", len(actives)/2)
+	msg = fmt.Sprintf("ATIVOS;%d", len(actives))
 
 	// Returns ATIVOS;0 if empty array
 	if len(actives) == 0 {
@@ -36,7 +36,7 @@ func mountActiveClientsResponse(actives []string) (msg string) {
 	}
 
 	for _, active := range actives {
-		msg += ";" + active
+		msg += ";" + active + ";" + active
 	}
 	// msg += '\n'
 	msg += fmt.Sprintf("%c", '\n')

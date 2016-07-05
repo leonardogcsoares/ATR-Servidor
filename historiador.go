@@ -59,4 +59,5 @@ func runHistoricalServerConnection(request []byte) (response string) {
 
 	response = string(result)
 	return
+
 }

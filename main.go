@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"sync"
 	"time"
 )
 
@@ -14,6 +15,8 @@ const (
 	interfaceServPort = ":6000"
 	historicServPort  = ":5000"
 )
+
+var mutex sync.Mutex
 
 func main() {
 
@@ -86,7 +89,7 @@ func runInterfaceServerConn(listener *net.TCPListener) {
 				// Respond with active clients
 				// 1. Get active clients from Gateway
 				// 2. Mount message with active clients using moutActiveClientsResponse
-				msg := mountActiveClientsResponse([]string{"015225", "015225", "115389", "115389"})
+				msg := mountActiveClientsResponse([]string{"015225", "023123"})
 				// msg := mountActiveClientsResponse(retrieveActiveIDs())
 				fmt.Println(msg)
 				// 3. Send message using conn.Write
@@ -113,15 +116,55 @@ func runInterfaceServerConn(listener *net.TCPListener) {
 						// Vel:      pos.Speed,
 						// State:    "1",
 						DateTime: "123123123",
-						Lat:      "+32.32232",
-						Long:     "-1232113.23",
+						Lat:      "-43.933",
+						Long:     "-19.917",
 						Vel:      "44",
 						State:    "1",
 					}}
 					msg = mountHistoricsResponse(data, id)
 				} else {
 					// If more than one samples for given ID
-					msg = runHistoricalServerConnection(request)
+					// msg = runHistoricalServerConnection(request)
+
+					data := []positionData{
+						{
+							DateTime: "123123123",
+							Lat:      "-43.933",
+							Long:     "-19.917",
+							Vel:      "44",
+							State:    "1",
+						},
+						{
+							DateTime: "2391321983012",
+							Lat:      "-23.933",
+							Long:     "-39.917",
+							Vel:      "44",
+							State:    "1",
+						},
+						{
+							DateTime: "123123123",
+							Lat:      "+43.933",
+							Long:     "-19.917",
+							Vel:      "44",
+							State:    "1",
+						},
+						{
+							DateTime: "348932842",
+							Lat:      "-43.933",
+							Long:     "-33.917",
+							Vel:      "44",
+							State:    "1",
+						},
+						{
+							DateTime: "123123123",
+							Lat:      "-4.933",
+							Long:     "-19.917",
+							Vel:      "44",
+							State:    "1",
+						},
+					}
+					msg = mountHistoricsResponse(data, id)
+
 				}
 
 				// 3. Send message using conn.Write
@@ -164,7 +207,7 @@ func runGatewayServerConn(listener *net.TCPListener) {
 			}
 
 			if readLen == 0 {
-				fmt.Println("Connection Lost for interface")
+				fmt.Println("Connection Lost for Gateway")
 				break // connection already closed by client
 
 			} else if parseGatewayRequestType(request) == "UPDATE" {
