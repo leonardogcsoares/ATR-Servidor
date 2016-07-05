@@ -1,9 +1,8 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
-	"io/ioutil"
-	"net"
 	"regexp"
 )
 
@@ -32,32 +31,50 @@ func parseHistRequest(str []byte) (id string, samples string) {
 	return
 }
 
+type rsp struct {
+	ID        string
+	Timestamp string
+	Lat       string
+	Long      string
+	Speed     string
+}
+
 func runHistoricalServerConnection(request []byte) (response string) {
 
-	fmt.Println("Init Historical Addr")
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", historicServPort)
+	var rsps []rsp
+	db, _ = sql.Open("sqlite3", "./test.db")
+	defer db.Close()
+	id, samples := parseHistRequest(request)
+	queryStr := fmt.Sprintf("SELECT * FROM CLIENTES WHERE `ID`=%s ORDER BY ROWID DESC LIMIT %s", id, samples)
+	rows, err := db.Query(queryStr)
+	defer rows.Close()
+
 	if err != nil {
-		fmt.Println(err.Error())
-	}
-	fmt.Println("Init Historical TCP Connection")
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 	}
 
-	fmt.Println("Write to socket, hist request:", string(request))
-	_, err = conn.Write(request)
-	if err != nil {
-		fmt.Println(err.Error())
+	for rows.Next() {
+		var rowID string
+		var timestamp string
+		var lat string
+		var long string
+		var speed string
+		err = rows.Scan(&rowID, &timestamp, &lat, &long, &speed)
+		var data = struct {
+			ID        string
+			Timestamp string
+			Lat       string
+			Long      string
+			Speed     string
+		}{ID: rowID, Timestamp: timestamp, Lat: lat, Long: long, Speed: speed}
+		rsps = append(rsps, data)
 	}
 
-	result, err := ioutil.ReadAll(conn)
-	if err != nil {
-		fmt.Println(err.Error())
+	response = fmt.Sprintf("HIST;%d;%s", len(rsps), id)
+	for _, d := range rsps {
+		response += fmt.Sprintf(";POS;%s;%s;%s;%s;%d", d.Timestamp, d.Lat, d.Long, d.Speed, 1)
 	}
-	fmt.Println("Read result from socket", string(result))
 
-	response = string(result)
 	return
 
 }

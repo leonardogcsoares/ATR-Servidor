@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net"
 	"sync"
@@ -17,10 +18,10 @@ const (
 )
 
 var mutex sync.Mutex
+var db *sql.DB
 
 func main() {
 
-	test()
 	fmt.Print("\n\n")
 
 	// Inicializar conexao com fila de mensagens
