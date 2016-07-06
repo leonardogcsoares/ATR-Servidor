@@ -42,7 +42,11 @@ type rsp struct {
 func runHistoricalServerConnection(request []byte) (response string) {
 
 	var rsps []rsp
-	db, _ = sql.Open("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./test.db")
+	if err != nil {
+		fmt.Println("Error on connection string")
+		return ""
+	}
 	defer db.Close()
 	id, samples := parseHistRequest(request)
 	queryStr := fmt.Sprintf("SELECT * FROM CLIENTES WHERE `ID`=%s ORDER BY ROWID DESC LIMIT %s", id, samples)
