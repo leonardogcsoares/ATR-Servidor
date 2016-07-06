@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"regexp"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "go-sqlite3"
 )
 
 const (
