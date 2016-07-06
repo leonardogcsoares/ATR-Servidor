@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"regexp"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -44,12 +46,12 @@ func runHistoricalServerConnection(request []byte) (response string) {
 	var rsps []rsp
 	db, err := sql.Open("sqlite3", "./test.db")
 	if err != nil {
-		fmt.Println("Error on connection string")
+		fmt.Println("Error on connection string", err.Error())
 		return ""
 	}
 	defer db.Close()
 	id, samples := parseHistRequest(request)
-	queryStr := fmt.Sprintf("SELECT * FROM CLIENTES WHERE `ID`=%s ORDER BY ROWID DESC LIMIT %s", id, samples)
+	queryStr := fmt.Sprintf("SELECT `ID`, `TIMESTAMP`, `LATITUDE`, `LONGITUDE`, `SPEED` FROM CLIENTES WHERE `ID`=%s ORDER BY `ROWID` DESC LIMIT %s", id, samples)
 	rows, err := db.Query(queryStr)
 	defer rows.Close()
 

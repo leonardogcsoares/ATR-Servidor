@@ -22,8 +22,6 @@ var db *sql.DB
 
 func main() {
 
-	fmt.Print("\n\n")
-
 	// Inicializar conexao com fila de mensagens
 	// https://astaxie.gitbooks.io/build-web-application-with-golang/content/en/08.1.html
 	positionList = make(map[string]position, 1000000)
@@ -125,46 +123,46 @@ func runInterfaceServerConn(listener *net.TCPListener) {
 					msg = mountHistoricsResponse(data, id)
 				} else {
 					// If more than one samples for given ID
-					// msg = runHistoricalServerConnection(request)
+					msg = runHistoricalServerConnection(request)
 
-					data := []positionData{
-						{
-							DateTime: "123123123",
-							Lat:      "-43.933",
-							Long:     "-19.917",
-							Vel:      "44",
-							State:    "1",
-						},
-						{
-							DateTime: "2391321983012",
-							Lat:      "-23.933",
-							Long:     "-39.917",
-							Vel:      "44",
-							State:    "1",
-						},
-						{
-							DateTime: "123123123",
-							Lat:      "+43.933",
-							Long:     "-19.917",
-							Vel:      "44",
-							State:    "1",
-						},
-						{
-							DateTime: "348932842",
-							Lat:      "-43.933",
-							Long:     "-33.917",
-							Vel:      "44",
-							State:    "1",
-						},
-						{
-							DateTime: "123123123",
-							Lat:      "-4.933",
-							Long:     "-19.917",
-							Vel:      "44",
-							State:    "1",
-						},
-					}
-					msg = mountHistoricsResponse(data, id)
+					// data := []positionData{
+					// 	{
+					// 		DateTime: "123123123",
+					// 		Lat:      "-43.933",
+					// 		Long:     "-19.917",
+					// 		Vel:      "44",
+					// 		State:    "1",
+					// 	},
+					// 	{
+					// 		DateTime: "2391321983012",
+					// 		Lat:      "-23.933",
+					// 		Long:     "-39.917",
+					// 		Vel:      "44",
+					// 		State:    "1",
+					// 	},
+					// 	{
+					// 		DateTime: "123123123",
+					// 		Lat:      "+43.933",
+					// 		Long:     "-19.917",
+					// 		Vel:      "44",
+					// 		State:    "1",
+					// 	},
+					// 	{
+					// 		DateTime: "348932842",
+					// 		Lat:      "-43.933",
+					// 		Long:     "-33.917",
+					// 		Vel:      "44",
+					// 		State:    "1",
+					// 	},
+					// 	{
+					// 		DateTime: "123123123",
+					// 		Lat:      "-4.933",
+					// 		Long:     "-19.917",
+					// 		Vel:      "44",
+					// 		State:    "1",
+					// 	},
+					// }
+					// msg = mountHistoricsResponse(data, id)
 
 				}
 
